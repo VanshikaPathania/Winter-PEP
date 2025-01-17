@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Account Simulator</title>
+</head>
+<body>
+  <h1>Bank Account Simulator</h1>
+  
+  <div>
+    <label>Account Number: </label>
+    <input type="text" id="account" readonly>
+    <button onclick="generateAccount()">Generate Account</button>
+  </div>
+
+  <div>
+    <h3>Create Account</h3>
+    <input type="number" id="initialDeposit" placeholder="Initial Deposit">
+    <button onclick="createAccount()">Create Account</button>
+  </div>
+
+  <div id="actions" style="display:none;">
+    <h3>Account Actions</h3>
+    <p id="balance">Current Balance: $0.00</p>
+    <input type="number" id="amount" placeholder="Amount">
+    <button onclick="transaction('deposit')">Deposit</button>
+    <button onclick="transaction('withdraw')">Withdraw</button>
+  </div>
+
+  <script>
+    const bankAccount = (() => {
+      let balance = 0, accountCreated = false;
+
+      const updateUI = () => {
+        document.getElementById('balance').textContent = `Current Balance: $${balance.toFixed(2)}`;
+        document.getElementById('actions').style.display = 'block';
+      };
+
+      return {
+        create: (initial) => {
+          if (accountCreated) return alert("Account already exists.");
+          accountCreated = true;
+          balance = initial;
+          alert(`Account created with balance: $${balance.toFixed(2)}`);
+          updateUI();
+        },
+        transact: (type, amount) => {
+          if (!accountCreated) return alert("Create an account first.");
+          if (type === 'deposit') balance += amount;
+          if (type === 'withdraw') {
+            if (amount > balance) return alert("Insufficient balance.");
+            balance -= amount;
+          }
+          alert(`${type === 'deposit' ? 'Deposited' : 'Withdrew'}: $${amount.toFixed(2)}`);
+          updateUI();
+        }
+      };
+    })();
+
+    const generateAccount = () => {
+      document.getElementById('account').value = Math.floor(Math.random() * 10000 + 10000);
+    };
+
+    const createAccount = () => {
+      const initial = parseFloat(document.getElementById('initialDeposit').value);
+      if (initial > 0) bankAccount.create(initial);
+      else alert("Enter a valid deposit amount.");
+    };
+
+    const transaction = (type) => {
+      const amount = parseFloat(document.getElementById('amount').value);
+      if (amount > 0) bankAccount.transact(type, amount);
+      else alert("Enter a valid amount.");
+    };
+  </script>
+</body>
+</html>
